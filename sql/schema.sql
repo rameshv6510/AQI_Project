@@ -1,0 +1,5 @@
+-- The application creates a portable SQLite/PostgreSQL-compatible schema in src/db.py.
+-- Run `python run_pipeline.py` to initialize all dimensions, facts, and audit tables.
+-- Tables: dim_stations, dim_pollutants, dim_dates, fact_raw_readings,
+-- fact_weather, fact_hourly_aggregates, fact_daily_aqi, extraction_log,
+-- rejected_records_log.

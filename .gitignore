@@ -1,0 +1,39 @@
+# Python and virtual environments
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+.python-version
+
+# Environment files and secrets
+.env
+.env.*
+!.env.example
+
+# Local databases and database tooling
+*.db
+*.sqlite
+*.sqlite3
+airflow.db
+
+# Generated data and logs
+data/raw/*
+!data/raw/.gitkeep
+data/extraction_logs/*
+!data/extraction_logs/.gitkeep
+logs/
+*.log
+
+# Test, cache, and local tooling files
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+.vscode/
+.idea/
+
+# Operating-system files
+.DS_Store
+Thumbs.db

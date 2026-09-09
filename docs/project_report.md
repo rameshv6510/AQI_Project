@@ -1,0 +1,3 @@
+# AQI Analysis and Prediction — Part 1 Report
+
+This project implements a Bengaluru air-quality data platform. OpenAQ supplies station-level pollutant readings; Open-Meteo supplies hourly weather. Raw JSON responses are retained before timestamp, unit, and pollutant-code normalization. The cleaned layer deduplicates readings and applies physical range checks, logging rejected observations. Gold tables provide hourly pollutant aggregates and daily CPCB AQI, which the Streamlit dashboard displays through six analytical views. Apache Airflow provides daily orchestration, and the architecture is designed to support a Part 2 MLOps extension for next-day AQI forecasting.
