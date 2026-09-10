@@ -13,6 +13,16 @@ def ingest_openaq(engine=None):
     for station in STATIONS:
         try:
             response=requests.get(f"{OPENAQ_BASE_URL}/locations/{station['station_id']}/latest",headers=OPENAQ_HEADERS,timeout=20); response.raise_for_status(); payload=response.json(); payload["station_id"]=station["station_id"]
+            sensors_response = requests.get(f"{OPENAQ_BASE_URL}/locations/{station['station_id']}/sensors",headers=OPENAQ_HEADERS,params={"limit":100},timeout=20)
+            sensors_response.raise_for_status()
+            sensors = {
+                str(sensor["id"]): sensor.get("parameter", {})
+                for sensor in sensors_response.json().get("results", [])
+            }
+            for result in payload.get("results", []):
+                parameter = sensors.get(str(result.get("sensorsId")), {})
+                result["parameter"] = parameter.get("name")
+                result["unit"] = parameter.get("units")
             path=RAW_OPENAQ_DIR/f"openaq_station_{station['station_id']}_{int(time.time())}.json"; path.write_text(json.dumps(payload,indent=2),encoding="utf-8")
             count += len(payload.get("results",[]))
         except requests.RequestException as exc: errors.append(f"{station['station_id']}: {exc}")

@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+from datetime import date
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 import pandas as pd
 import plotly.express as px
@@ -18,8 +19,31 @@ def load(table):
     except Exception: return pd.DataFrame()
 daily,hourly,weather,logs,rejections=map(load,["fact_daily_aqi","fact_hourly_aggregates","fact_weather","extraction_log","rejected_records_log"])
 options={s["name"]:s["station_id"] for s in STATIONS}; selected=st.sidebar.selectbox("Monitoring station",list(options)); station=options[selected]
-if not daily.empty: daily["date"]=pd.to_datetime(daily["date"]); filtered=daily[daily.station_id.astype(str)==station]
+if not daily.empty:
+    daily["date"]=pd.to_datetime(daily["date"])
+    station_daily = daily[daily.station_id.astype(str)==station]
+    min_date = station_daily["date"].min().date()
+    max_date = station_daily["date"].max().date()
+    picker_max_date = max(max_date, date.today())
+    selected_dates = st.sidebar.date_input(
+        "Date range",
+        value=(min_date, max_date),
+        min_value=min_date,
+        max_value=picker_max_date,
+    )
+    st.sidebar.caption(f"Available AQI data: {min_date} to {max_date}")
+    if isinstance(selected_dates, tuple) and len(selected_dates) == 2:
+        start_date, end_date = selected_dates
+    else:
+        start_date = end_date = selected_dates
+    filtered=daily[
+        (daily.station_id.astype(str)==station)
+        & (daily["date"].dt.date >= start_date)
+        & (daily["date"].dt.date <= end_date)
+    ]
 else: filtered=pd.DataFrame()
+if not filtered.empty and end_date > max_date:
+    st.sidebar.info("The selected range includes dates without AQI observations yet.")
 if not daily.empty and "source" not in daily.columns:
     st.info("Data shown in this dashboard may include locally seeded demonstration data. Run the live pipeline after configuring OPENAQ_API_KEY for live observations.")
 k1,k2,k3=st.columns(3)

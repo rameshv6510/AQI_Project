@@ -25,7 +25,8 @@ def stage_openaq_data():
                 if value is None: continue
                 code = str(parameter).lower().replace("pm2.5", "pm25").replace("pm10", "pm10")
                 unit, value = normalize_pollutant_unit(code, item.get("unit", ""), value)
-                timestamp = item.get("date", {}).get("utc") if isinstance(item.get("date"), dict) else item.get("datetime")
+                timestamp_value = item.get("date", item.get("datetime"))
+                timestamp = timestamp_value.get("utc") if isinstance(timestamp_value, dict) else timestamp_value
                 rows.append({"station_id":station_id,"pollutant_code":code,"value":value,"unit":unit,"timestamp":parse_iso_timestamp(timestamp),"source":"OpenAQ","extracted_at":pd.Timestamp.now(tz="UTC")})
         except (ValueError, KeyError, OSError): continue
     return pd.DataFrame(rows, columns=["station_id","pollutant_code","value","unit","timestamp","source","extracted_at"])
